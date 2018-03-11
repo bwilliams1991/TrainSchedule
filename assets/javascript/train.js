@@ -31,7 +31,6 @@ $("#submitInfo").on("click", function (event) {
 	freq = $("#trainFreq").val().trim();
 	start = $("#trainStart").val().trim();
 
-
 	// Save the new data in Firebase
 	database.ref().push({
 		name: name,
@@ -50,17 +49,26 @@ database.ref().on("child_added", function (snapshot) {
 	var tdDest = snapshot.val().dest;
 	var tdFreq = snapshot.val().freq;
 	var tdStart = snapshot.val().start;
-	// var dateFormat = ("MM/DD/YYYY");
-	// var convertedDate = moment(tdStart).format(dateFormat);
 
-	// var tdMonths = moment().diff(moment(convertedDate), "minutes");
-	// var tdTotal = tdMonths * tdstart;
-	// if (tdMonths <= 0) {
-	// 	tdTotal = 0;
-	// }
-	// var now = moment().format(dateFormat);
+	var tdStartConvert = moment(tdStart, "HH:mm").subtract(1, "years");
 
-	// $("#trainTable").append("<tr><td>" + "tdName" + "</td><td>" + "tdDest" + "</td><td>" + "tdMonths" + "</td><td>$" + "tdStart" + "</td><td>$" + "tdTotal" + "</td></tr>");
+	// current time
+	var now = moment(); // The time is now
+	console.log("CURRENT TIME: " + moment(now).format("HH:mm"));
 
-	$("#trainTable").append("<tr><td>" + tdName + "</td><td>" + tdDest + "</td><td>" + tdFreq + "</td><td>" + tdStart + "</td><td>");
+	// difference between the times
+	var difference = moment().diff(moment(tdStartConvert), "minutes");
+
+	// remainder
+	var Remain = difference % tdFreq;
+
+	// minutes until train
+	var tillTrain = tdFreq - Remain;
+
+	// next train
+	var nextTrain = moment().add(tillTrain, "minutes");
+	var nextTrainConvert = moment(nextTrain).format("HH:mm");
+
+	$("#trainTable").append("<tr><td>" + tdName + "</td><td>" + tdDest + "</td><td>" + tdFreq + "</td><td>" + nextTrainConvert + "</td><td>" + tillTrain + "</td><td>");
 });
+
